@@ -1,12 +1,7 @@
 
 # MATH521 - Numerical Analysis of PDE
 
-This git repository contains some course materials for `MATH521 - Numerical Analysis of PDE`, taught at UBC, by C Ortner. I will update/change the content throughout term and announce updates in class. Feel free to try it out but be aware that it might change throughout term.
-
-### Notebooks Updated for 2025
-
-- `finitedifference.ipynb`
-- `fem1d.ipynb`
+This git repository contains some course materials for `MATH521 - Numerical Analysis of PDE`, taught at UBC, by C Ortner. As of 2025, this is now taught as a 1/2 course on FEM and a 1/2 course on spectral methods. I will update/change the content throughout term and announce updates in class. Feel free to try it out but be aware that it might change throughout term. 
 
 ### Get started 
 

@@ -46,7 +46,7 @@ function triginterp_fft(f::Function, N)
     X = xgrid(N)
     # nodal values at interpolation nodes
     F = f.(X) 
-    return fft(F) / N    
+    return fft(F) / (2*N)    
 end 
 
 
@@ -67,7 +67,7 @@ function evaltrig_grid(F̂, M::Integer)
     F̂_M[1:N] .= F̂[1:N]
     F̂_M[end-N+1:end] .= F̂[end-N+1:end]
     x = xgrid(M) 
-    Fx = ifft(F̂_M) * (2*M)
+    Fx = real.(ifft(F̂_M) * 2*M)
     return Fx, x
 end
 
