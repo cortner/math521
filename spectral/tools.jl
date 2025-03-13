@@ -59,7 +59,7 @@ evaltrig(x, F̂) = sum( real(F̂k * exp(im * x * k))
                       for (F̂k, k) in zip(F̂, kgrid(length(F̂) ÷ 2)) )
 
 
-function evaltrig_grid(F̂, M::Integer)
+function evaltrig_grid(F̂::AbstractVector, M::Integer)
     N = length(F̂) ÷ 2
     @assert 2 * N == length(F̂)
     @assert M >= N 
