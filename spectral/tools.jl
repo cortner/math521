@@ -71,4 +71,77 @@ function evaltrig_grid(F̂::AbstractVector, M::Integer)
     return Fx, x
 end
 
+# ------------------------ 
+# Utilities for dim > 1 
+
+"""
+Given a one-dimensional array y, return d d-dimensional arrays 
+ y ⊗ 1 ⊗ ... ⊗ 1   (x1-coordinate)
+ 1 ⊗ y ⊗ 1 ⊗ ...   (x2-coordinate)
+... 
+ 1 ⊗ ... ⊗ 1 ⊗ y   (xd-coordinate)
+"""
+function tensorgrid(d, x1)
+    dims = ntuple(i -> length(x1), d)
+    X = reshape(x1 * ones(Bool, length(x1)^(d-1))', dims)
+    pdim(i, d) = (dd = collect(1:d); dd[1] = i; dd[i] = 1; tuple(dd...))
+    return ntuple(i -> permutedims(X, pdim(i,d)), d)
+end
+
+"""
+d-dimensional x grid 
+"""
+xgrid(d, N) = tensorgrid(d, xgrid(N))
+
+"""
+d-dimensional k-grid 
+"""
+kgrid(d, N) = tensorgrid(d, kgrid(N))
+
+
+"""
+construct the coefficients of the trigonometric interpolant
+in d dimensions
+"""
+function triginterp_fft(f::Function, N, d::Integer)
+    XX = xgrid(d, N)
+    # nodal values at interpolation nodes
+    F = f.(XX...) 
+    return fft(F) / (2*N)^d
+end 
+
+function evaltrig_grid(F̂::AbstractArray{T, 2}, M::Integer) where {T}
+    N = size(F̂, 1) ÷ 2;
+    @assert size(F̂) == (2*N, 2*N)
+    @assert M >= N
+    F̂_M = zeros(ComplexF64, (2*M, 2*M)) 
+    kk1 = 1:N; kk2 = N+1:2*N; kk3 = 2*M-N+1:2*M
+    F̂_M[kk1, kk1] .= F̂[kk1, kk1]
+    F̂_M[kk1, kk3] .= F̂[kk1, kk2]
+    F̂_M[kk3, kk1] .= F̂[kk2, kk1] 
+    F̂_M[kk3, kk3] .= F̂[kk2, kk2]
+    x = xgrid(M) 
+    Fx = real.(ifft(F̂_M) * (2*M)^2)
+    return Fx, x
+end
+
+function evaltrig_grid(F̂::AbstractArray{T, 3}, M::Integer) where {T}
+    N = size(F̂, 1) ÷ 2;
+    @assert size(F̂) == (2*N, 2*N, 2*N)
+    @assert M >= N
+    F̂_M = zeros(ComplexF64, (2*M, 2*M, 2*M))
+    kk1 = 1:N; kk2 = N+1:2*N; kk3 = 2*M-N+1:2*M
+    F̂_M[kk1, kk1, kk1] .= F̂[kk1, kk1, kk1]
+    F̂_M[kk1, kk1, kk3] .= F̂[kk1, kk1, kk2]
+    F̂_M[kk1, kk3, kk1] .= F̂[kk1, kk2, kk1]
+    F̂_M[kk1, kk3, kk3] .= F̂[kk1, kk2, kk2]
+    F̂_M[kk3, kk1, kk1] .= F̂[kk2, kk1, kk1]
+    F̂_M[kk3, kk1, kk3] .= F̂[kk2, kk1, kk2]
+    F̂_M[kk3, kk3, kk1] .= F̂[kk2, kk2, kk1]
+    F̂_M[kk3, kk3, kk3] .= F̂[kk2, kk2, kk2]
+    x = xgrid(M) 
+    Fx = real.(ifft(F̂_M) * (2*M)^3)
+    return Fx, x
+end
+
 nothing
