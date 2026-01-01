@@ -1,0 +1,7 @@
+Manifest.toml
+*.png
+*.vtu
+test
+scratch
+.vscode
+.ipynb_checkpoints
