@@ -1,11 +1,11 @@
 
 # MATH521 - Numerical Analysis of PDE
 
-This git repository contains some course materials for `MATH521 - Numerical Analysis of PDE`, taught at UBC, by C Ortner. As of 2025, this is now taught as a 1/2 course on FEM and a 1/2 course on spectral methods. I will update/change the content throughout term and announce updates in class. Feel free to try it out but be aware that it might change throughout term. 
+This git repository contains course materials for `MATH521 - Numerical Analysis of PDE`, I have been teaching UBC. As of 2025 it has become a mixed FEM and spectral methods course. I will update/change the content throughout term and announce updates in class. Feel free to try it out but be aware that it might change throughout term. 
 
 ### Get started 
 
-- All materials are provided as Julia scripts or notebooks. To install Julia, follow the instructions at [https://julialang.org](https://julialang.org). I suggest to use 1.10. I have not tested this material on Julia 1.10.
+- All materials are provided as Julia scripts or notebooks. To install Julia, follow the instructions at [https://julialang.org](https://julialang.org). For 2025/26 I plan to use Julia 1.12.
 - Clone this `git` repository to your local computer, say to the folder `.../math521`. If you don't know how to use git, Atlassian makes [some great tutorials](https://www.atlassian.com/git/tutorials). If you don't want to learn git, then you can also just download the repository, but it will make it awkward to update it.
 - You can setup your environment by starting Julia in the folder `.../math521`, then start the Julia REPL, type `]` to switch to the package manager and then 
 ``` 
