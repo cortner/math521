@@ -1,6 +1,14 @@
 
 # using QuadGK, LinearAlgebra, FFTW 
 
+# -------------------------------------------- 
+
+"""
+    function eval_p1(x, U)
+
+evaluates a piecewise affine function on the interval (-pi, pi) 
+with uniform grid spacing and nodal values U at the point x.
+"""
 function eval_p1(x, U)
     N = div( (length(U) - 1), 2 )
     h = pi / N 
@@ -13,6 +21,81 @@ function eval_p1(x, U)
     x1 = -pi + h * i1
     return U[i1] + (x - x1) * (U[i2] - U[i1]) / h
 end
+
+# -------------------------------------------- 
+#
+#   Makie & Ferrite Plotting Tools 
+#
+
+using GeometryBasics: TriangleFace
+
+# this is a little wrapper around Makie.mesh to plot 
+# P1 functions on unstructured meshes
+function trisurf!(ax, grid, U; kwargs...)
+    x = [n.x[1] for n in grid.nodes]
+    y = [n.x[2] for n in grid.nodes]
+    z = U
+    faces = TriangleFace.([ c.nodes for c in grid.cells ])
+    mesh!(ax, x, y, z, faces, color=z, kwargs...)
+end
+
+function trisurf(grid, U; size = (300, 300), kwargs...)
+    fig = Figure(size = size)
+    ax = Axis3(fig[1,1]; )
+    trisurf!(ax, grid, U; kwargs...) 
+    return fig
+end
+
+function trimesh!(ax, grid; kwargs...)
+    x = Float64[]
+    y = Float64[] 
+    for c in grid.cells 
+        for (i, j) in zip(c.nodes, circshift(c.nodes, 1))
+            push!(x, grid.nodes[i].x[1])
+            push!(x, grid.nodes[j].x[1])
+            push!(y, grid.nodes[i].x[2])
+            push!(y, grid.nodes[j].x[2])
+        end
+    end 
+    return linesegments!(ax, x, y; kwargs...)
+end
+
+function trimesh(grid; size = (300, 300), kwargs...)
+    fig = Figure(size = size)
+    ax = Axis(fig[1,1]; )
+    hidedecorations!(ax); hidespines!(ax)
+    trimesh!(ax, grid; kwargs...)
+    return fig 
+end
+
+
+
+"""
+simple utility function to plot a Ferrite.jl P1 FEM solution
+"""
+function trisurf_ferrite(u, dh, pgrid = dh.grid; 
+                    sym = :u, size = (400, 400), kwargs...) 
+    fig = Figure(size = size)
+    ax = Axis3(fig[1,1]; )
+    
+    # evaluate the function at the nodes of the plotting grid 
+    # sounds stupid when it's the same grid, but it is just 
+    # a simple trick to get the right ordering which ferrite 
+    # messes up internally ... 
+    pnodes = [ Tensors.Vec(n.x...) for n in pgrid.nodes ]
+    ph = PointEvalHandler(dh.grid, pnodes)
+    pu = evaluate_at_points(ph, dh, u, :u)
+    
+    trisurf!(ax, pgrid, pu; kwargs...) 
+    return fig 
+end
+
+
+# -------------------------------------------- 
+#
+#   Trigonometric interpolation tools 
+#
+
 
 #=
 
@@ -31,7 +114,6 @@ function compute_fcoeffs_quad(f_fun, N)
     return fhat, kgrid
 end
 
-# ----------------
 
 "interpolation nodes"
 xgrid(N) = [ j * π / N  for j = 0:2N-1 ]
